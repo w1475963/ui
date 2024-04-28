@@ -3,7 +3,7 @@ local genStr = string.rep
 
 dofile(vim.g.base46_cache .. "nvcheatsheet")
 
-vim.api.nvim_create_autocmd("BufWinLeave", {
+api.nvim_create_autocmd("BufWinLeave", {
   callback = function()
     if vim.bo.ft == "nvcheatsheet" then
       vim.g.nvcheatsheet_displayed = false
@@ -15,11 +15,15 @@ return function()
   local mappings_tb = {}
   require("nvchad.cheatsheet").organize_mappings(mappings_tb)
 
-  vim.g.nv_previous_buf = vim.api.nvim_get_current_buf()
-  local buf = api.nvim_create_buf(false, true)
+  vim.g.nv_previous_buf = api.nvim_get_current_buf()
 
-  local win = require("nvchad.cheatsheet").getLargestWin()
-  vim.api.nvim_set_current_win(win)
+  local buf = api.nvim_create_buf(false, true)
+  require("nvchad.cheatsheet").create_fullsize_win(buf)
+
+  local win = api.nvim_get_current_win()
+
+  api.nvim_set_current_win(win)
+  vim.wo[win].winhl = "NormalFloat:Normal"
 
   local centerPoint = api.nvim_win_get_width(win) / 2
 
@@ -28,8 +32,7 @@ return function()
 
   for _, section in pairs(mappings_tb) do
     for _, keymap in ipairs(section) do
-      largest_str = largest_str > #keymap[1] + #keymap[2] and largest_str
-        or #keymap[2] + #keymap[2]
+      largest_str = largest_str > #keymap[1] + #keymap[2] and largest_str or #keymap[2] + #keymap[2]
     end
   end
 
@@ -112,7 +115,7 @@ return function()
   api.nvim_buf_set_lines(buf, 3, -1, false, result)
 
   -- set highlights
-  local nvcheatsheet = vim.api.nvim_create_namespace "nvcheatsheet"
+  local nvcheatsheet = api.nvim_create_namespace "nvcheatsheet"
 
   local hlgroups_types = {
     heading = "NvChHeading",
@@ -138,6 +141,6 @@ return function()
   require("nvchad.utils").set_cleanbuf_opts "nvcheatsheet"
 
   vim.keymap.set("n", "<ESC>", function()
-    require("nvchad.tabufline").close_buffer(buf)
+    vim.cmd "q"
   end, { buffer = buf })
 end
