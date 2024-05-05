@@ -176,15 +176,23 @@ M.lsp_msg = function()
 end
 
 M.lsp = function()
+  local res = ""
   if rawget(vim, "lsp") then
     for _, client in ipairs(vim.lsp.get_active_clients()) do
       if client.attached_buffers[M.stbufnr()] and client.name ~= "null-ls" then
+        if client.name=='typos_lsp' then
+          res = "  "
+          if vim.o.columns>90 then
+            res = res.."(typos)"
+          end
+          break
+        end
         return (vim.o.columns > 90 and "  LSP~" .. client.name .. " ") or "  "
       end
     end
   end
 
-  return ""
+  return res
 end
 
 M.diagnostics = function()
