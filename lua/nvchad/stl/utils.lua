@@ -169,7 +169,7 @@ M.lsp_msg = function()
       if mini_title:len() > 8 then
         break
       end
-      mini_title = mini_title .. word:sub(0, 3)
+      mini_title = mini_title ..(vim.o.columns<70  and "" or " ").. word:sub(0, 3)
     end
     content = string.format(" %%<%s%s%s ",  mini_title, waiting[frame2 + 1],spinners[pp + 1])
   end
