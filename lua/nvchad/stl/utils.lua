@@ -115,14 +115,18 @@ M.git = function()
   end
 
   local git_status = vim.b[M.stbufnr()].gitsigns_status_dict
-  local blank = " "
+  local blank_icon_num = " "
+  local blank_between_items = " "
   if vim.o.columns < 120 then
-    blank = ""
+    blank_icon_num = ""
   end
-  local added = (git_status.added and git_status.added ~= 0) and (" " .. blank .. git_status.added) or ""
-  local changed = (git_status.changed and git_status.changed ~= 0) and (" " .. blank .. git_status.changed) or ""
-  local removed = (git_status.removed and git_status.removed ~= 0) and (" " .. blank .. git_status.removed) or ""
-  local branch_name = "" .. blank .. git_status.head
+  if vim.o.columns < 90 then
+    blank_between_items = ""
+  end
+  local added = (git_status.added and git_status.added ~= 0) and (blank_between_items.."" .. blank_icon_num .. git_status.added) or ""
+  local changed = (git_status.changed and git_status.changed ~= 0) and (blank_between_items.."" .. blank_icon_num .. git_status.changed) or ""
+  local removed = (git_status.removed and git_status.removed ~= 0) and (blank_between_items.."" .. blank_icon_num .. git_status.removed) or ""
+  local branch_name = "" .. blank_icon_num .. git_status.head
   if vim.o.columns < 40 then
     return " "
   end
