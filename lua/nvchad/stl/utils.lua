@@ -166,14 +166,14 @@ M.lsp_msg = function()
     local frame2 = math.floor(ms / 120) % #waiting
     local mini_title = ""
     for word in title:gmatch "([^%s]+)" do
-      if mini_title:len() > 4 then
+      if mini_title:len() > 8 then
         break
       end
-      mini_title = mini_title .. word:sub(0, 2)
+      mini_title = mini_title .. word:sub(0, 3)
     end
-    content = string.format(" %%<%s%s%s ", spinners[pp + 1], mini_title, waiting[frame2 + 1])
+    content = string.format(" %%<%s%s%s ",  mini_title, waiting[frame2 + 1],spinners[pp + 1])
   end
-  if vim.o.columns < 50 then
+  if vim.o.columns < 40 then
     content = string.format(" %%<%s ", spinners[pp + 1])
   end
   return content or ""
