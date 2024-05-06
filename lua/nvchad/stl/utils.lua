@@ -120,10 +120,10 @@ M.git = function()
   if vim.o.columns < 120 then
     blank_icon_num = ""
   end
-  if vim.o.columns < 90 then
+  if vim.o.columns < 60 then
     blank_between_items = ""
   end
-  local added = (git_status.added and git_status.added ~= 0) and (blank_between_items.."" .. blank_icon_num .. git_status.added) or ""
+  local added = (git_status.added and git_status.added ~= 0) and (blank_between_items.."󰐙" .. blank_icon_num .. git_status.added) or ""
   local changed = (git_status.changed and git_status.changed ~= 0) and (blank_between_items.."" .. blank_icon_num .. git_status.changed) or ""
   local removed = (git_status.removed and git_status.removed ~= 0) and (blank_between_items.."" .. blank_icon_num .. git_status.removed) or ""
   local branch_name = "" .. blank_icon_num .. git_status.head
