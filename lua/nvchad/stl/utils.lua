@@ -1,4 +1,5 @@
 local M = {}
+local version = vim.version().minor
 
 M.stbufnr = function()
   return vim.api.nvim_win_get_buf(vim.g.statusline_winid or 0)
@@ -71,6 +72,7 @@ M.modes = {
   ["c"] = { "COMMAND", "Command" },
   ["cv"] = { "COMMAND", "Command" },
   ["ce"] = { "COMMAND", "Command" },
+  ["cr"] = { "COMMAND", "Command" },
   ["r"] = { "PROMPT", "Confirm" },
   ["rm"] = { "MORE", "Confirm" },
   ["r?"] = { "CONFIRM", "Confirm" },
@@ -123,9 +125,15 @@ M.git = function()
   if vim.o.columns < 60 then
     blank_between_items = ""
   end
-  local added = (git_status.added and git_status.added ~= 0) and (blank_between_items.."󰐙" .. blank_icon_num .. git_status.added) or ""
-  local changed = (git_status.changed and git_status.changed ~= 0) and (blank_between_items.."" .. blank_icon_num .. git_status.changed) or ""
-  local removed = (git_status.removed and git_status.removed ~= 0) and (blank_between_items.."" .. blank_icon_num .. git_status.removed) or ""
+  local added = (git_status.added and git_status.added ~= 0)
+      and (blank_between_items .. "󰐙" .. blank_icon_num .. git_status.added)
+    or ""
+  local changed = (git_status.changed and git_status.changed ~= 0)
+      and (blank_between_items .. "" .. blank_icon_num .. git_status.changed)
+    or ""
+  local removed = (git_status.removed and git_status.removed ~= 0)
+      and (blank_between_items .. "" .. blank_icon_num .. git_status.removed)
+    or ""
   local branch_name = "" .. blank_icon_num .. git_status.head
   if vim.o.columns < 40 then
     return " "
@@ -137,57 +145,64 @@ M.git = function()
 end
 
 M.lsp_msg = function()
-  if not rawget(vim, "lsp") or vim.lsp.status or not M.is_activewin() then
+  if version < 10 then
     return ""
   end
 
-  local Lsp = vim.lsp.util.get_progress_messages()[1]
+  local msg = vim.lsp.status() or ""
 
-  if vim.o.columns < 50 or not Lsp then
+  if #msg == 0 or vim.o.columns < 50 then
     return ""
   end
 
-  if Lsp.done then
-    vim.defer_fn(function()
-      vim.cmd.redrawstatus()
-    end, 1000)
-  end
-
-  local msg = Lsp.message or ""
-  local percentage = Lsp.percentage or 0
-  local title = Lsp.title or ""
   local spinners = { "", "󰪞", "󰪟", "󰪠", "󰪢", "󰪣", "󰪤", "󰪥" }
-  local ms = vim.loop.hrtime() / 1000000
-  local frame = math.floor(ms / 120) % #spinners
-  local content = string.format(" %%<%s %s %s (%s%%%%) ", spinners[frame + 1], title, msg, percentage)
-  local pp = math.floor((percentage % 100) * 8 / 100)
+  local ms = vim.loop.hrtime() / 1e6
+  local frame = math.floor(ms / 100) % #spinners
+
+  local content = spinners[frame + 1] .. " " .. msg
+  -- local pp = math.floor((percentage % 100) * 8 / 100)
   if vim.o.columns < 100 then
     local waiting = { " ", ".", ":", "" }
-    local frame2 = math.floor(ms / 120) % #waiting
+    local frame2 = math.floor(ms / 100) % #waiting
     local mini_title = ""
-    for word in title:gmatch "([^%s]+)" do
+    for word in msg:gmatch "([^%s]+)" do
       if mini_title:len() > 8 then
         break
       end
-      mini_title = mini_title ..(vim.o.columns<70  and "" or " ").. word:sub(0, 3)
+      mini_title = mini_title .. (vim.o.columns < 70 and "" or " ") .. word:sub(0, 3)
     end
-    content = string.format(" %%<%s%s%s ",  mini_title, waiting[frame2 + 1],spinners[pp + 1])
+    content = mini_title .. waiting[frame2 + 1] -- .. spinners[pp + 1]
   end
   if vim.o.columns < 40 then
-    content = string.format(" %%<%s ", spinners[pp + 1])
+    -- content = spinners[pp + 1]
+    content = spinners[frame + 1]
   end
   return content or ""
 end
 
 M.lsp = function()
   local res = ""
-  if rawget(vim, "lsp") then
+  if rawget(vim, "lsp") and version >= 10 then
+    for _, client in ipairs(vim.lsp.get_clients()) do
+      if client.attached_buffers[M.stbufnr()] and client.name ~= "null-ls" then
+        if client.name == "typos_lsp" then
+          res = "  "
+          if vim.o.columns > 90 then
+            res = res .. "(typos)"
+          end
+          break
+        end
+        return (vim.o.columns > 90 and "  LSP~" .. client.name .. " ") or "  "
+      end
+    end
+  end
+  if rawget(vim, "lsp") and version < 10 then
     for _, client in ipairs(vim.lsp.get_active_clients()) do
       if client.attached_buffers[M.stbufnr()] and client.name ~= "null-ls" then
-        if client.name=='typos_lsp' then
+        if client.name == "typos_lsp" then
           res = "  "
-          if vim.o.columns>90 then
-            res = res.."(typos)"
+          if vim.o.columns > 90 then
+            res = res .. "(typos)"
           end
           break
         end

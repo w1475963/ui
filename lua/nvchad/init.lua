@@ -1,7 +1,7 @@
 local new_cmd = vim.api.nvim_create_user_command
 local config = require("nvconfig").ui
 
-vim.opt.statusline = "%!v:lua.require('nvchad.stl." .. config.statusline.theme .. "')()"
+vim.o.statusline = "%!v:lua.require('nvchad.stl." .. config.statusline.theme .. "')()"
 
 if config.tabufline.enabled then
   require "nvchad.tabufline.lazyload"
@@ -52,10 +52,13 @@ vim.api.nvim_create_autocmd("VimResized", {
   end,
 })
 
--- redraw statusline on LspProgressUpdate event & fixes #145
-vim.api.nvim_create_autocmd("User", {
-  pattern = "LspProgressUpdate",
-  callback = function()
-    vim.cmd "redrawstatus"
-  end,
-})
+if vim.version().minor >= 10 then
+  vim.api.nvim_create_autocmd("LspProgress", {
+    callback = function(args)
+      if string.find(args.match, "end") then
+        vim.cmd "redrawstatus"
+      end
+      vim.cmd "redrawstatus"
+    end,
+  })
+end
