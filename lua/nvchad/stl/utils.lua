@@ -148,8 +148,7 @@ M.lsp_msg = function()
   if version < 10 then
     return ""
   end
-
-  local msg = vim.lsp.status() or ""
+  local msg = vim.lsp.status()
 
   if #msg == 0 or vim.o.columns < 50 then
     return ""
