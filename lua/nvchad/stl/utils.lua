@@ -167,7 +167,7 @@ M.lsp_msg = function()
       content =content .. word:sub(1, 1):upper() .. word:sub(2) -- 每个单词首字母大写
     end
   end
-  return spinners[frame + 1] .. " " .. (content or "")
+  return " %<"..spinners[frame + 1] .. " " .. (content or "")
 end
 
 M.lsp = function()
@@ -187,7 +187,7 @@ M.lsp = function()
     end
   end
   if rawget(vim, "lsp") and version < 10 then
-    for _, client in ipairs(vim.lsp.get_active_clients()) do
+    for _, client in ipairs(vim.lsp.get_clients()) do
       if client.attached_buffers[M.stbufnr()] and client.name ~= "null-ls" then
         if client.name == "typos_lsp" then
           res = "  "
