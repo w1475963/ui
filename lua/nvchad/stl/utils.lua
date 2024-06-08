@@ -161,13 +161,14 @@ M.lsp_msg = function()
   local content = msg
   -- local pp = math.floor((percentage % 100) * 8 / 100)
   if vim.o.columns < 100 and vim.o.columns > 40 then
-    local words = msg:lower():gsub("%s+", ""):gmatch "%w+" -- 分割字符串成单词并转为小写
+    local words = msg:lower():gsub("[^%w ]","") -- 分割字符串成单词并转为小写
     content = ""
-    for word in words do
+    for word in words:gmatch("%w+") do
       content =content .. word:sub(1, 1):upper() .. word:sub(2) -- 每个单词首字母大写
     end
+    content = content:sub(1,#content - #(content:match("%d*$")))
   end
-  return spinners[frame + 1] .. " " .. (content and content..">% " or "")
+  return spinners[frame + 1] .. " %<" .. (content and content or "")
 end
 
 M.lsp = function()
