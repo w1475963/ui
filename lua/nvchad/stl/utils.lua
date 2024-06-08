@@ -167,7 +167,7 @@ M.lsp_msg = function()
       content =content .. word:sub(1, 1):upper() .. word:sub(2) -- 每个单词首字母大写
     end
   end
-  return spinners[frame + 1] .. " " .. (content and content.."%> " or "")
+  return spinners[frame + 1] .. " " .. (content and content.." >% " or "")
 end
 
 M.lsp = function()
