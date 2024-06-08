@@ -33,7 +33,7 @@ end
 M.file = function()
   local x = utils.file()
   local name = " " .. x[2] .. " "
-  if x[2]=="" then
+  if x[2] == "" then
     name = ""
   end
   return "%#St_file# " .. x[1] .. name .. "%#St_file_sep#" .. sep_r
@@ -55,7 +55,7 @@ end
 
 M.cwd = function()
   local icon = "%#St_cwd_icon#" .. "󰉋 "
-  local name = vim.loop.cwd()
+  local name = vim.uv.cwd()
   name = "%#St_cwd_text#" .. " " .. (name:match "([^/\\]+)[/\\]*$" or name) .. " "
   return (vim.o.columns > 85 and ("%#St_cwd_sep#" .. sep_l .. icon .. name)) or ""
 end

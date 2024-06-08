@@ -155,28 +155,19 @@ M.lsp_msg = function()
   end
 
   local spinners = { "", "󰪞", "󰪟", "󰪠", "󰪢", "󰪣", "󰪤", "󰪥" }
-  local ms = vim.loop.hrtime() / 1e6
+  local ms = vim.uv.hrtime() / 1e6
   local frame = math.floor(ms / 100) % #spinners
 
-  local content = spinners[frame + 1] .. " " .. msg
+  local content = msg
   -- local pp = math.floor((percentage % 100) * 8 / 100)
-  if vim.o.columns < 100 then
-    local waiting = { " ", ".", ":", "" }
-    local frame2 = math.floor(ms / 100) % #waiting
-    local mini_title = ""
-    for word in msg:gmatch "([^%s]+)" do
-      if mini_title:len() > 8 then
-        break
-      end
-      mini_title = mini_title .. (vim.o.columns < 70 and "" or " ") .. word:sub(0, 3)
+  if vim.o.columns < 100 and vim.o.columns > 40 then
+    local words = msg:lower():gsub("%s+", ""):gmatch "%w+" -- 分割字符串成单词并转为小写
+    content = ""
+    for word in words do
+      content =" %%<".. content .. word:sub(1, 1):upper() .. word:sub(2) -- 每个单词首字母大写
     end
-    content = mini_title .. waiting[frame2 + 1] -- .. spinners[pp + 1]
   end
-  if vim.o.columns < 40 then
-    -- content = spinners[pp + 1]
-    content = spinners[frame + 1]
-  end
-  return content or ""
+  return spinners[frame + 1] .. " " .. (content or "")
 end
 
 M.lsp = function()
