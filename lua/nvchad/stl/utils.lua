@@ -164,7 +164,7 @@ M.lsp_msg = function()
     local words = msg:lower():gsub("%s+", ""):gmatch "%w+" -- 分割字符串成单词并转为小写
     content = ""
     for word in words do
-      content =" %%<".. content .. word:sub(1, 1):upper() .. word:sub(2) -- 每个单词首字母大写
+      content =content .. word:sub(1, 1):upper() .. word:sub(2) -- 每个单词首字母大写
     end
   end
   return spinners[frame + 1] .. " " .. (content or "")
