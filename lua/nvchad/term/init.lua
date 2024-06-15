@@ -139,8 +139,7 @@ M.runner = function(opts)
       cmd = format_cmd(opts.cmd)
       set_buf(x.buf)
     end
-    
-    local cmd = format_cmd(opts.cmd)
+
     local job_id = vim.b[x.buf].terminal_job_id
     vim.api.nvim_chan_send(job_id, clear_cmd .. cmd .. " \n")
   end
