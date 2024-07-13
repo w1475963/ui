@@ -17,8 +17,11 @@ if config.lsp.signature then
     callback = function(args)
       local client = vim.lsp.get_client_by_id(args.data.client_id)
 
-      if client and client.server_capabilities.signatureHelpProvider then
-        require("nvchad.lsp.signature").setup(client, args.buf)
+      if client then
+        local signatureProvider = client.server_capabilities.signatureHelpProvider
+        if signatureProvider and signatureProvider.triggerCharacters then
+          require("nvchad.lsp.signature").setup(client, args.buf)
+        end
       end
     end,
   })
@@ -49,14 +52,7 @@ autocmd("BufWritePost", {
     local app_name = vim.env.NVIM_APPNAME and vim.env.NVIM_APPNAME or "nvim"
     local module = string.gsub(fp, "^.*/" .. app_name .. "/lua/", ""):gsub("/", ".")
 
-    require("plenary.reload").reload_module "nvconfig"
-    require("plenary.reload").reload_module "chadrc"
-    require("plenary.reload").reload_module "base46"
-    require("plenary.reload").reload_module "nvchad"
-    require("plenary.reload").reload_module(module)
-
-    require "nvchad"
-    require("base46").load_all_highlights()
+    require("nvchad.utils").reload(module)
     -- vim.cmd("redraw!")
   end,
 })

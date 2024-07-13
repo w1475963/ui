@@ -248,4 +248,11 @@ M.diagnostics = function()
   return " " .. err .. warn .. hints .. info
 end
 
+M.separators = {
+  default = { left = "", right = "" },
+  round = { left = "", right = "" },
+  block = { left = "█", right = "█" },
+  arrow = { left = "", right = "" },
+}
+
 return M
