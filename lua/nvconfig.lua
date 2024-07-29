@@ -1,15 +1,16 @@
----@type ChadrcConfig
 local options = {
 
-  ui = {
-    -- hl = highlights
+  base46 = {
+    theme = "onedark", -- default theme
     hl_add = {},
     hl_override = {},
+    integrations = {},
     changed_themes = {},
-    theme_toggle = { "onedark", "one_light" },
-    theme = "onedark", -- default theme
     transparency = false,
+    theme_toggle = { "onedark", "one_light" },
+  },
 
+  ui = {
     cmp = {
       icons = true,
       lspkind_text = true,
@@ -74,16 +75,14 @@ local options = {
     },
   },
 
-  base46 = {
-    integrations = {},
-  },
-
   lsp = { signature = true },
 
   cheatsheet = {
     theme = "grid", -- simple/grid
     excluded_groups = { "terminal (t)", "autopairs", "Nvim", "Opens" }, -- can add group name or with mode
   },
+
+  mason = { cmd = true, pkgs = {} },
 }
 
 return vim.tbl_deep_extend("force", options, require "chadrc")

@@ -6,13 +6,9 @@
 ---@field lsp? NvLspConfig
 ---@field term? TermConfig
 ---@field cheatsheet? NvCheatsheetConfig
+---@field mason? MasonConfig
 
 ---@class Base46Config
----@field integrations? Base46Integrations[]
-
---- UI related configuration
---- e.g. colorschemes, statusline themes, cmp themes, dashboard, some LSP ui related
----@class UIConfig
 --- List of highlights group to add.
 --- Should be highlights that is not a part of base46 default integrations
 --- (The default is all hlgroup that can be found from `hl_override`)
@@ -48,6 +44,11 @@
 --- You can try out the theme by executing `:Telescope themes`
 --- see https://github.com/NvChad/base46/tree/master/lua/base46/themes
 ---@field theme? ThemeName
+---@field integrations? Base46Integrations[]
+
+--- UI related configuration
+--- e.g. statusline, cmp themes, dashboard
+---@class UIConfig
 ---@field cmp? NvCmpConfig
 ---@field telescope? NvTelescopeConfig
 ---@field statusline? NvStatusLineConfig
@@ -153,3 +154,7 @@
 ---@field winopts? table
 ---@field sizes? TermSizes
 ---@field float? TermFloat
+
+---@class MasonConfig
+---@field command? boolean
+---@field pkgs? string[]
