@@ -156,7 +156,7 @@ M.lsp_msg = function()
 
   local spinners = { " ", "󰪞 ", "󰪟 ", "󰪠 ", "󰪢 ", "󰪣 ", "󰪤 ", "󰪥 " }
   local ms = vim.uv.hrtime() / 1e6
-  local frame = math.floor(ms / 10) % #spinners
+  local frame = math.floor(ms / 200) % #spinners
   local content = msg
   -- local pp = math.floor((percentage % 100) * 8 / 100)
   if vim.o.columns < 100 and vim.o.columns > 40 then
