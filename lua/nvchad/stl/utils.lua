@@ -82,7 +82,7 @@ M.modes = {
 
 -- credits to ii14 for str:match func
 M.file = function()
-  local icon = "󰈚"
+  local icon = "󰈚 "
   local path = vim.api.nvim_buf_get_name(M.stbufnr())
   local name = (path == "" and "Empty") or path:match "([^/\\]+)[/\\]*$"
 
@@ -122,19 +122,19 @@ M.git = function()
   if vim.o.columns < 120 then
     blank_icon_num = ""
   end
-  if vim.o.columns < 60 then
+  if vim.o.columns < 80 then
     blank_between_items = ""
   end
   local added = (git_status.added and git_status.added ~= 0)
-      and (blank_between_items .. "󰐙" .. blank_icon_num .. git_status.added)
+      and (blank_between_items .. "󰐕" .. blank_icon_num .. git_status.added)
     or ""
   local changed = (git_status.changed and git_status.changed ~= 0)
-      and (blank_between_items .. "" .. blank_icon_num .. git_status.changed)
+      and (blank_between_items .. "⨀" .. blank_icon_num .. git_status.changed)
     or ""
   local removed = (git_status.removed and git_status.removed ~= 0)
-      and (blank_between_items .. "" .. blank_icon_num .. git_status.removed)
+      and (blank_between_items .. "∼" .. blank_icon_num .. git_status.removed)
     or ""
-  local branch_name = "" .. blank_icon_num .. git_status.head
+  local branch_name = "" .. blank_icon_num .. git_status.head
   if vim.o.columns < 40 then
     return " "
   end
@@ -154,54 +154,45 @@ M.lsp_msg = function()
     return ""
   end
 
-  local spinners = { "", "󰪞", "󰪟", "󰪠", "󰪢", "󰪣", "󰪤", "󰪥" }
+  local spinners = { " ", "󰪞 ", "󰪟 ", "󰪠 ", "󰪢 ", "󰪣 ", "󰪤 ", "󰪥 " }
   local ms = vim.uv.hrtime() / 1e6
-  local frame = math.floor(ms / 100) % #spinners
-
+  local frame = math.floor(ms / 10) % #spinners
   local content = msg
   -- local pp = math.floor((percentage % 100) * 8 / 100)
   if vim.o.columns < 100 and vim.o.columns > 40 then
-    local words = msg:lower():gsub("[^%w ]","") -- 分割字符串成单词并转为小写
+    local words = msg:lower():gsub("[^%w ]", "") -- 分割字符串成单词并转为小写
     content = ""
-    for word in words:gmatch("%w+") do
-      content =content .. word:sub(1, 1):upper() .. word:sub(2) -- 每个单词首字母大写
+    for word in words:gmatch "%w+" do
+      content = content .. word:sub(1, 1):upper() .. word:sub(2) -- 每个单词首字母大写
     end
-    content = content:sub(1,#content - #(content:match("%d*$")))
+    content = content:sub(1, #content - #(content:match "%d*$"))
   end
   return spinners[frame + 1] .. " %<" .. (content and content or "")
 end
 
 M.lsp = function()
   local res = ""
+  local had_typos = ""
+  local lsp_name = ""
   if rawget(vim, "lsp") and version >= 10 then
     for _, client in ipairs(vim.lsp.get_clients()) do
       if client.attached_buffers[M.stbufnr()] and client.name ~= "null-ls" then
+        res = " "
         if client.name == "typos_lsp" then
-          res = "  "
-          if vim.o.columns > 90 then
-            res = res .. "(typos)"
-          end
+          had_typos = "󰊄"
+        else
+          lsp_name = client.name
+        end
+        if #res ~= 0 and #had_typos ~= 0 then
           break
         end
-        return (vim.o.columns > 90 and "  LSP~" .. client.name .. " ") or "  "
       end
     end
-  end
-  if rawget(vim, "lsp") and version < 10 then
-    for _, client in ipairs(vim.lsp.get_clients()) do
-      if client.attached_buffers[M.stbufnr()] and client.name ~= "null-ls" then
-        if client.name == "typos_lsp" then
-          res = "  "
-          if vim.o.columns > 90 then
-            res = res .. "(typos)"
-          end
-          break
-        end
-        return (vim.o.columns > 90 and "  LSP~" .. client.name .. " ") or "  "
-      end
+    if vim.o.columns > 90 then
+      return res .. had_typos .. "~" .. lsp_name
     end
+    return res .. had_typos
   end
-
   return res
 end
 
@@ -214,22 +205,23 @@ M.diagnostics = function()
   local warn = #vim.diagnostic.get(M.stbufnr(), { severity = vim.diagnostic.severity.WARN })
   local hints = #vim.diagnostic.get(M.stbufnr(), { severity = vim.diagnostic.severity.HINT })
   local info = #vim.diagnostic.get(M.stbufnr(), { severity = vim.diagnostic.severity.INFO })
-  local err_tag = ""
-  local warn_tag = ""
-  local hints_tag = "󰛩"
-  local info_tag = "󰋼"
+  local err_tag = " "
+  local warn_tag = " "
+  local hints_tag = "󰛩 "
+  local info_tag = "󰋼 "
 
-  if vim.o.columns > 90 then
-    err_tag = err_tag .. " " .. err .. " "
-    warn_tag = warn_tag .. " " .. warn .. " "
-    hints_tag = hints_tag .. " " .. hints .. " "
-    info_tag = info_tag .. " " .. info .. " "
-  elseif vim.o.columns > 60 then
+  -- if vim.o.columns > 90 then
+  --   err_tag = err_tag .. " " .. err .. " "
+  --   warn_tag = warn_tag .. " " .. warn .. " "
+  --   hints_tag = hints_tag .. " " .. hints .. " "
+  --   info_tag = info_tag .. " " .. info .. " "
+  -- else
+    if vim.o.columns > 80 then
     err_tag = err_tag .. err .. " "
     warn_tag = warn_tag .. warn .. " "
     hints_tag = hints_tag .. hints .. " "
     info_tag = info_tag .. info .. " "
-  elseif vim.o.columns > 40 then
+  elseif vim.o.columns > 60 then
     err_tag = err_tag .. err
     warn_tag = warn_tag .. warn
     hints_tag = hints_tag .. hints
@@ -240,12 +232,12 @@ M.diagnostics = function()
     hints_tag = "" .. hints
     info_tag = "" .. info
   end
-  err = (err and err > 0) and ("%#St_lspError#" .. err_tag) or ""
-  warn = (warn and warn > 0) and ("%#St_lspWarning#" .. warn_tag) or ""
-  hints = (hints and hints > 0) and ("%#St_lspHints#" .. hints_tag) or ""
-  info = (info and info > 0) and ("%#St_lspInfo#" .. info_tag) or ""
+  local err_s = (err and err > 0) and ("%#St_lspError#" .. err_tag) or ""
+  local warn_s = (warn and warn > 0) and ("%#St_lspWarning#" .. warn_tag) or ""
+  local hints_s = (hints and hints > 0) and ("%#St_lspHints#" .. hints_tag) or ""
+  local info_s = (info and info > 0) and ("%#St_lspInfo#" .. info_tag) or ""
 
-  return " " .. err .. warn .. hints .. info
+  return " " .. err_s .. warn_s .. hints_s .. info_s
 end
 
 M.separators = {
