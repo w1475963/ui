@@ -4,6 +4,7 @@ local state = require "nvchad.themes.state"
 local redraw = require("volt").redraw
 
 local scrolled = false
+local textchanged = false
 
 local function reload_theme(name)
   require("nvconfig").base46.theme = name
@@ -12,9 +13,9 @@ local function reload_theme(name)
   require "volt.highlights"
 end
 
-local map = function(keys, func, opts)
+local map = function(mode, keys, func, opts)
   for _, key in ipairs(keys) do
-    vim.keymap.set("i", key, func, opts)
+    vim.keymap.set(mode, key, func, opts)
   end
 end
 
@@ -39,7 +40,7 @@ local function scroll_down(n, direction)
   end
 end
 
-map({ "<C-n>", "<Down>" }, function()
+local function move_down()
   if #state.themes_shown > 0 then
     local theme = set_index(1)
     reload_theme(theme)
@@ -52,9 +53,12 @@ map({ "<C-n>", "<Down>" }, function()
       end)
     end
   end
-end, { buffer = state.input_buf })
+end
 
-map({ "<C-p>", "<Up>" }, function()
+map("i", { "<C-n>", "<Down>" }, move_down, { buffer = state.input_buf })
+map("n", { "j", "<Down>" }, move_down, { buffer = state.input_buf })
+
+local function move_up()
   if #state.themes_shown > 0 then
     local theme = set_index(-1)
     reload_theme(theme)
@@ -65,11 +69,15 @@ map({ "<C-p>", "<Up>" }, function()
       scroll_down(state.scroll_step[state.style], "up")
     end)
   end
-end, { buffer = state.input_buf })
+end
 
-map({ "<cr>" }, function()
+map("i", { "<C-p>", "<Up>" }, move_up, { buffer = state.input_buf })
+map("n", { "k", "<Up>" }, move_up, { buffer = state.input_buf })
+
+map({ "i", "n" }, { "<cr>" }, function()
   local name = state.themes_shown[state.index]
-  local chadrc = dofile(vim.fn.stdpath "config" .. "/lua/chadrc.lua")
+  package.loaded.chadrc = nil
+  local chadrc = require "chadrc"
   local old_theme = chadrc.base46.theme
 
   old_theme = '"' .. old_theme .. '"'
@@ -78,8 +86,9 @@ map({ "<cr>" }, function()
   require("volt").close()
 end, { buffer = state.input_buf })
 
-map({ "<esc>" }, function()
-  require("volt").close()
+-- delete text
+map("i", { "<C-w>" }, function()
+  vim.api.nvim_input "<c-s-w>"
 end, { buffer = state.input_buf })
 
 ---------------------- autocmds ----------------------
@@ -96,7 +105,7 @@ autocmd("TextChangedI", {
       end)
     end
 
-    local promptlen = vim.fn.strwidth(state.prompt)
+    local promptlen = api.nvim_strwidth(state.prompt)
     local input = api.nvim_get_current_line():sub(promptlen + 1, -1)
     input = input:gsub("%s", "")
 
@@ -113,11 +122,12 @@ autocmd("TextChangedI", {
 
     api.nvim_set_option_value("modifiable", false, { buf = state.buf })
 
-    if #state.themes_shown > 0 then
+    if textchanged and #state.themes_shown > 0 then
       reload_theme(state.themes_shown[1])
     end
 
     redraw(state.buf, "all")
     scrolled = false
+    textchanged = true
   end,
 })
