@@ -33,11 +33,13 @@ Base46 setup
  -- put this in your main init.lua file ( before lazy setup )
  vim.g.base46_cache = vim.fn.stdpath "data" .. "/base46_cache/"
 
- -- put this after lazy setup
+-- put this after lazy setup 
+
+-- (method 1, For heavy lazyloaders)
  dofile(vim.g.base46_cache .. "defaults")
  dofile(vim.g.base46_cache .. "statusline")
 
--- To load all integrations at once
+-- (method 2, for non lazyloaders) to load all highlights at once
  for _, v in ipairs(vim.fn.readdir(vim.g.base46_cache)) do
    dofile(vim.g.base46_cache .. v)
  end
@@ -90,7 +92,7 @@ Base46 setup
 
 - 150 ~ LOC Dashboard module, minimal & nothing fancy!
  
-![2024-09-30-203737_2560x1440_scrot](https://github.com/user-attachments/assets/67e83795-50b7-44fd-8b68-19ded1e31346)
+![nvdash](https://github.com/user-attachments/assets/072c8733-8a44-4cf3-8732-e5fa7eb9459e)
 
 ## Cmp styles
 
@@ -123,6 +125,22 @@ Base46 setup
 - Colors hex color on buffer and lsp colors on the buffer, like tailwind etc
 
 ![image](https://github.com/user-attachments/assets/c5f3dc55-7810-48ae-879e-25453ab16b71)
+
+## Automatic Mason install 
+
+- MasonInstallAll command will now capture all the mason tools from your config
+- Supported plugins are : lspconfig, nvim-lint, conform.nvim
+- So for example if you have lspconfig like this :
+
+```lua 
+require("lspconfig").html.setup{}
+require("lspconfig").clangd.setup{}
+``` 
+<br/>
+
+Then running MasonInstallAll will install both the mason pkgs 
+
+check `:h nvui.mason` for more info
 
 # Credits
 
