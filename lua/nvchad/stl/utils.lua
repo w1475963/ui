@@ -1,5 +1,4 @@
 local M = {}
-local version = vim.version().minor
 
 M.stbufnr = function()
   return vim.api.nvim_win_get_buf(vim.g.statusline_winid or 0)
@@ -145,9 +144,6 @@ M.git = function()
 end
 
 M.lsp_msg = function()
-  if version < 10 then
-    return ""
-  end
   local msg = vim.lsp.status()
 
   if #msg == 0 or vim.o.columns < 50 then
@@ -174,7 +170,7 @@ M.lsp = function()
   local res = ""
   local had_typos = ""
   local lsp_name = ""
-  if rawget(vim, "lsp") and version >= 10 then
+  if rawget(vim, "lsp") then
     for _, client in ipairs(vim.lsp.get_clients()) do
       if client.attached_buffers[M.stbufnr()] and client.name ~= "null-ls" then
         res = " "
