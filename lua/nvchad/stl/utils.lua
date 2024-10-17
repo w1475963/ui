@@ -144,7 +144,7 @@ M.git = function()
 end
 
 M.lsp_msg = function()
-  local msg = vim.lsp.status()
+  local msg = M.state.lsp_msg
 
   if #msg == 0 or vim.o.columns < 50 then
     return ""
@@ -242,5 +242,29 @@ M.separators = {
   block = { left = "█", right = "█" },
   arrow = { left = "", right = "" },
 }
+
+M.state = { lsp_msg = "" }
+
+local spinners = { "", "󰪞", "󰪟", "󰪠", "󰪢", "󰪣", "󰪤", "󰪥" }
+local spinner_w = 100 / #spinners
+
+M.autocmds = function()
+  vim.api.nvim_create_autocmd("LspProgress", {
+    pattern = { "begin", "end" },
+    callback = function(args)
+      local data = args.data.params.value
+      local progress = ""
+
+      if data.percentage then
+        local icon = spinners[math.floor(data.percentage / spinner_w) + 1]
+        progress = icon .. " " .. data.percentage .. "%% "
+      end
+
+      local str = progress .. (data.message or "") .. " " .. (data.title or "")
+      M.state.lsp_msg = data.kind == "end" and "" or str
+      vim.cmd.redrawstatus()
+    end,
+  })
+end
 
 return M
