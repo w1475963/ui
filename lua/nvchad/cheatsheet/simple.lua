@@ -47,6 +47,9 @@ return function(buf, win, action)
   end
 
   local box_w = max_strlen + gapx + 5
+  if action ~= "redraw" and (math.floor(win_w / 2) - math.floor(box_w / 2)) <= 0 then
+    return require "nvchad.cheatsheet.md_text"()
+  end
 
   local function addpadding(str)
     local pad = box_w - strw(str)
