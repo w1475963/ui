@@ -101,6 +101,9 @@ M.open = function(buf, win, action)
 
   local row_i = math.floor((winh / 2) - (#dashboard / 2))
   local col_i = math.floor((winw / 2) - math.floor(nvdash_w / 2)) - 6 -- (5 is textoff)
+  if col_i<0 then
+    col_i  = 0
+  end
 
   -- make all lines available
   local empty_str = {}
@@ -117,6 +120,7 @@ M.open = function(buf, win, action)
     v.txt = "  " .. v.txt .. "  "
     v.hl = v.hl or "NvDashButtons"
     local opt = { virt_text_pos = "overlay", virt_text = { { v.txt, v.hl } } }
+    print(col_i)
     api.nvim_buf_set_extmark(buf, ns, row_i + i, col_i, opt)
 
     if v.cmd then
