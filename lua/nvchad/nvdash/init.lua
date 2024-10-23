@@ -152,7 +152,7 @@ M.open = function(buf, win, action)
     end
   end, buf)
 
-  require("nvchad.utils").set_cleanbuf_opts "nvdash"
+  require("nvchad.utils").set_cleanbuf_opts("nvdash", buf)
 
   if action == "redraw" then
     return
