@@ -10,10 +10,10 @@ local M = {
     format = function(entry, item)
       local icons = require "nvchad.icons.lspkind"
 
+      item.kind = item.kind or "field"
       item.menu = cmp_ui.lspkind_text and item.kind or ""
-      item.menu_hl_group = atom_styled and "LineNr" or "CmpItemKind" .. (item.kind or "")
-
-      item.kind = item.kind and icons[item.kind] .. " " or ""
+      item.menu_hl_group = (atom_styled and "LineNr" or "CmpItemKind") .. item.kind
+      item.kind = icons[item.kind] .. " "
       item.kind = cmp_ui.icons_left and item.kind or " " .. item.kind
 
       if atom_styled or cmp_ui.icons_left then
